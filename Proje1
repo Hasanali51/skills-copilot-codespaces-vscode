@@ -1,0 +1,351 @@
+import 'package:flutter/material.dart'; // Flutter Material Design paketini import ediyoruz
+
+void main() {
+  runApp(MyApp()); // MyApp sınıfını çalıştırarak uygulamayı başlatıyoruz
+}
+
+class MyApp extends StatefulWidget {
+  // MyApp widget'ı, StatefulWidget olarak tanımlanıyor
+  const MyApp({Key? key}) : super(key: key); // StatefulWidget için constructor
+
+  @override
+  _MyAppState createState() =>
+      _MyAppState(); // MyApp widget'ının state'ini oluşturuyoruz
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isCampaignVisible =
+      false; // Kampanyaların görünür olup olmadığını tutan değişken
+  bool _isOrderDetailsVisible =
+      false; // Sipariş detaylarının görünür olup olmadığını tutan değişken
+  String _selectedOrder = ''; // Seçilen siparişin ismini tutan değişken
+  final GlobalKey<ScaffoldState> _scaffoldKey =
+      GlobalKey<ScaffoldState>(); // Scaffold yönetimi için anahtar
+  ScrollController _scrollController =
+      ScrollController(); // Yatay kaydırma için ScrollController
+
+  List<String> _cartItems = []; // Sepet için liste
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Çiftçiden al', // Uygulamanın başlığı
+      home: Scaffold(
+        key: _scaffoldKey, // Scaffold'un anahtarını atıyoruz
+        appBar: AppBar(
+          centerTitle: true, // Başlık metnini ortalıyoruz
+          title: Text(
+            'ÇİFTÇİDEN AL', // Uygulamanın başlık metni
+            style: TextStyle(
+              fontWeight: FontWeight.bold, // Başlık metnini kalın yapıyoruz
+              fontSize: 24, // Başlık metninin font büyüklüğünü ayarlıyoruz
+            ),
+          ),
+          leading: IconButton(
+            icon: Icon(Icons.menu), // Menü ikonunu ekliyoruz
+            onPressed: () {
+              _scaffoldKey.currentState?.openDrawer(); // Menü açma fonksiyonu
+            },
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.account_circle), // Profil ikonu ekliyoruz
+              onPressed: () {
+                _scaffoldKey.currentState
+                    ?.openEndDrawer(); // Profil menüsünü açıyoruz
+              },
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0), // Padding ekliyoruz
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText:
+                      'Uygulama içinde ara...', // Arama kutusunun ipucu metni
+                  prefixIcon: Icon(Icons.search), // Arama ikonunu ekliyoruz
+                  border: OutlineInputBorder(
+                    // Border ekliyoruz
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0), // Yatay padding
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _isCampaignVisible =
+                        !_isCampaignVisible; // Kampanyaların görünürlüğünü değiştiriyoruz
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity,
+                      50), // Butonun minimum boyutunu ayarlıyoruz
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        8), // Butonun köşelerini yuvarlıyoruz
+                  ),
+                ),
+                child: Text(
+                  'KAMPANYALAR', // Butonun yazısı
+                  style: TextStyle(fontSize: 18), // Yazı boyutunu ayarlıyoruz
+                ),
+              ),
+            ),
+            AnimatedOpacity(
+              opacity: _isCampaignVisible
+                  ? 1.0
+                  : 0.0, // Kampanyaların görünürlüğüne göre opaklık değiştiriyoruz
+              duration: Duration(milliseconds: 300), // Opaklık geçiş süresi
+              child: _isCampaignVisible
+                  ? Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height *
+                          2.5 /
+                          3, // Yüksekliği ekran boyutuna göre ayarlıyoruz
+                      padding: EdgeInsets.all(16),
+                      color: Colors.blue[100], // Arka plan rengini ayarlıyoruz
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment
+                            .start, // Çocuk öğeleri sola hizalıyoruz
+                        children: [
+                          Text(
+                            'Kampanyalı Ürünler', // Başlık metni
+                            style: TextStyle(
+                              fontWeight: FontWeight
+                                  .bold, // Başlık metnini kalın yapıyoruz
+                              fontSize: 24, // Başlık font büyüklüğü
+                            ),
+                          ),
+                          SizedBox(height: 20), // Yükseklik ekliyoruz
+                          Text(
+                              '• Ürün 1 - %50 İndirim'), // Kampanyalı ürünler listesi
+                          Text('• Ürün 2 - %30 İndirim'),
+                          Text('• Ürün 3 - %20 İndirim'),
+                          Text('• Ürün 4 - %15 İndirim'),
+                          Text('• Ürün 5 - %40 İndirim'),
+                          Text('• Ürün 6 - %25 İndirim'),
+                          Text('• Ürün 7 - %10 İndirim'),
+                        ],
+                      ),
+                    )
+                  : Container(),
+            ),
+            SizedBox(height: 20), // Yükseklik ekliyoruz
+            Text(
+              'Kampanyalı Mekanlar', // Başlık metni
+              style: TextStyle(
+                fontWeight: FontWeight.bold, // Başlık metnini kalın yapıyoruz
+                fontSize: 24, // Başlık font büyüklüğü
+              ),
+            ),
+            SizedBox(height: 20), // Yükseklik ekliyoruz
+            Stack(
+              children: [
+                Container(
+                  height: 150, // Yükseklik ayarlıyoruz
+                  child: SingleChildScrollView(
+                    scrollDirection:
+                        Axis.horizontal, // Yatay kaydırma yapıyoruz
+                    controller:
+                        _scrollController, // ScrollController ile kontrol ediyoruz
+                    child: Row(
+                      children: [
+                        _buildCampaignBox(
+                            'Mekan 1'), // Kampanya kutularını oluşturuyoruz
+                        _buildCampaignBox('Mekan 2'),
+                        _buildCampaignBox('Mekan 3'),
+                        _buildCampaignBox('Mekan 4'),
+                        _buildCampaignBox('Mekan 5'),
+                        _buildCampaignBox('Mekan 6'),
+                        _buildCampaignBox('Mekan 7'),
+                        _buildCampaignBox('Mekan 8'),
+                        _buildCampaignBox('Mekan 9'),
+                        _buildCampaignBox('Mekan 10'),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 0, // Sağ ok tuşunun konumu
+                  right: 0,
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_forward_ios), // Sağ ok ikonu
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        _scrollController.position.pixels +
+                            150, // Bir kutu boyutu kadar kaydırıyoruz
+                        duration:
+                            Duration(milliseconds: 300), // Kaydırma süresi
+                        curve: Curves.easeInOut, // Kaydırma animasyonu
+                      );
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: 0, // Sol ok tuşunun konumu
+                  left: 0,
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back_ios), // Sol ok ikonu
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        _scrollController.position.pixels -
+                            150, // Bir kutu boyutu kadar geri kaydırıyoruz
+                        duration:
+                            Duration(milliseconds: 300), // Kaydırma süresi
+                        curve: Curves.easeInOut, // Kaydırma animasyonu
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: Center(
+                child: Text('Merhaba Flutter!'), // Merhaba Flutter! yazısı
+              ),
+            ),
+          ],
+        ),
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.blue, // Drawer başlığı için arka plan rengi
+                ),
+                child: Text(
+                  'Siparişlerim', // Drawer başlığı
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24), // Başlık metni rengi ve boyutu
+                ),
+              ),
+              ListTile(
+                title: Text('Aktif Siparişler'), // Menü öğesi
+                onTap: () {
+                  setState(() {
+                    _selectedOrder =
+                        'Aktif Siparişler'; // Seçilen siparişi güncelliyoruz
+                    _isOrderDetailsVisible =
+                        true; // Sipariş detaylarını gösteriyoruz
+                  });
+                  Navigator.pop(context); // Drawer'ı kapatıyoruz
+                },
+              ),
+              ListTile(
+                title: Text('Geçmiş Siparişler'), // Menü öğesi
+                onTap: () {
+                  setState(() {
+                    _selectedOrder =
+                        'Geçmiş Siparişler'; // Seçilen siparişi güncelliyoruz
+                    _isOrderDetailsVisible =
+                        true; // Sipariş detaylarını gösteriyoruz
+                  });
+                  Navigator.pop(context); // Drawer'ı kapatıyoruz
+                },
+              ),
+              ListTile(
+                title: Text('Diğer Seçenekler'), // Menü öğesi
+                onTap: () {
+                  setState(() {
+                    _selectedOrder =
+                        'Diğer Seçenekler'; // Seçilen siparişi güncelliyoruz
+                    _isOrderDetailsVisible =
+                        true; // Sipariş detaylarını gösteriyoruz
+                  });
+                  Navigator.pop(context); // Drawer'ı kapatıyoruz
+                },
+              ),
+            ],
+          ),
+        ),
+        endDrawer: Drawer(
+          child: ListView(
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.blue, // Drawer başlığı için arka plan rengi
+                ),
+                child: Text(
+                  'Profil Bilgileri', // Profil başlığı
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24), // Profil başlığı metni rengi ve boyutu
+                ),
+              ),
+              ListTile(
+                title: Text('Ad: Hasan Ali TURGUT '), // Profil bilgisi
+              ),
+              ListTile(
+                title: Text(
+                    'Email: TURGUTHAASANALİ51@GMAİL.com'), // Profil bilgisi
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            _showCartDialog(context); // Sepet diyalog kutusunu gösteriyoruz
+          },
+          child: Icon(Icons.shopping_cart), // Sepet ikonu
+          backgroundColor: Colors.orange, // Butonun arka plan rengi
+        ),
+      ),
+    );
+  }
+
+  // Mekan kutuları widget'ı
+  Widget _buildCampaignBox(String name) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _cartItems.add(name); // Seçilen mekanı sepete ekliyoruz
+        });
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 8), // Yatay margin ekliyoruz
+        width: 120, // Genişlik ayarlıyoruz
+        color: Colors.orange[100], // Arka plan rengini ayarlıyoruz
+        child: Center(
+          child: Text(name,
+              style: TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.bold)), // Mekan adı
+        ),
+      ),
+    );
+  }
+
+  // Sepet için Dialog'u göstermek
+  void _showCartDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Sepetim'), // Diyalog başlığı
+          content: Column(
+            mainAxisSize: MainAxisSize.min, // Küçük boyutlu içerik
+            children: _cartItems.isEmpty
+                ? [Text('Sepetiniz boş.')] // Sepet boşsa uyarı metni
+                : _cartItems
+                    .map((item) => Text(item))
+                    .toList(), // Sepet içeriği
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Kapat'), // Kapatma butonu
+              onPressed: () {
+                Navigator.of(context).pop(); // Diyalog penceresini kapatıyoruz
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
